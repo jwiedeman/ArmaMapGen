@@ -6,9 +6,9 @@ Building footprints are analysed to approximate size and orientation and then ma
 ## Usage
 
 ```bash
-pip install -r requirements.txt  # install dependencies (osmnx, rasterio, pillow, numpy, SRTM.py, shapely)
+pip install -r requirements.txt  # install dependencies (osmnx, rasterio, pillow, numpy, SRTM.py, shapely, scikit-learn)
 python generate_map.py --north <lat> --south <lat> --east <lon> --west <lon> --size 512 --outdir output
 ```
 
-The script will create `heightmap.png`, `roads.json`, and `buildings.json` in the specified output directory.  
-Each building entry now contains a chosen prefab name, rotation angle and approximate dimensions.
+The script will create `heightmap.png`, `roads.json`, `buildings.json` and `scatter_props.json` in the specified output directory.
+Each building entry contains a chosen prefab name, rotation angle and approximate dimensions. The script clusters buildings into towns using DBSCAN and scatters simple props (street lights, mailboxes, benches) around clustered buildings.

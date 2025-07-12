@@ -6,7 +6,9 @@ import numpy as np
 import json
 import argparse
 import math
+import random
 from shapely.geometry import Polygon
+from sklearn.cluster import DBSCAN
 
 
 def fetch_heightmap(north, south, east, west, size=512):
@@ -101,6 +103,31 @@ def extract_roads(north, south, east, west):
     return roads
 
 
+def detect_towns(buildings, eps=0.001, min_samples=5):
+    if not buildings:
+        return []
+    coords = np.array([b['position'] for b in buildings])
+    clustering = DBSCAN(eps=eps, min_samples=min_samples).fit(coords)
+    return clustering.labels_
+
+
+def generate_scatter_props(buildings, labels):
+    prop_types = ['street_light', 'mailbox', 'bench']
+    props = []
+    for b, label in zip(buildings, labels):
+        if label == -1:
+            continue
+        num = random.randint(0, 2)
+        for _ in range(num):
+            offset_x = random.uniform(-0.0001, 0.0001)
+            offset_y = random.uniform(-0.0001, 0.0001)
+            props.append({
+                'type': random.choice(prop_types),
+                'position': [b['position'][0] + offset_x, b['position'][1] + offset_y]
+            })
+    return props
+
+
 def main():
     parser = argparse.ArgumentParser(description='Generate map data from real-world location')
     parser.add_argument('--north', type=float, required=True)
@@ -117,6 +144,8 @@ def main():
 
     buildings = extract_buildings(args.north, args.south, args.east, args.west)
     roads = extract_roads(args.north, args.south, args.east, args.west)
+    labels = detect_towns(buildings)
+    props = generate_scatter_props(buildings, labels)
 
     with open(os.path.join(args.outdir, 'buildings.json'), 'w') as f:
         json.dump(buildings, f)
@@ -124,6 +153,8 @@ def main():
         json.dump(roads, f)
     with open(os.path.join(args.outdir, 'heightmap.json'), 'w') as f:
         json.dump(height_data, f)
+    with open(os.path.join(args.outdir, 'scatter_props.json'), 'w') as f:
+        json.dump(props, f)
 
 
 if __name__ == '__main__':
