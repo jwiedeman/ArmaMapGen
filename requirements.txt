@@ -4,3 +4,4 @@ pillow
 numpy
 SRTM.py
 shapely
+scikit-learn
