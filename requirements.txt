@@ -5,3 +5,5 @@ numpy
 SRTM.py
 shapely
 scikit-learn
+requests
+beautifulsoup4

@@ -10,6 +10,8 @@ import random
 from shapely.geometry import Polygon
 from sklearn.cluster import DBSCAN
 
+from prefab_utils import load_prefabs
+
 
 def fetch_heightmap(north, south, east, west, size=512):
     data = srtm.get_data()
@@ -36,15 +38,7 @@ def extract_buildings(north, south, east, west):
     tags = {"building": True}
     gdf = ox.features_from_bbox((west, south, east, north), tags)
 
-    prefabs = {
-        "residential": [
-            {"name": "Small_House_A", "width": 10, "length": 8},
-            {"name": "Small_House_B", "width": 12, "length": 9},
-        ],
-        "commercial": [{"name": "Shop_A", "width": 20, "length": 15}],
-        "industrial": [{"name": "Warehouse_B", "width": 30, "length": 20}],
-        "generic": [{"name": "Apartment_Block_C", "width": 40, "length": 15}],
-    }
+    prefabs = load_prefabs()
 
     def match_prefab(w, l, b_type):
         options = prefabs.get(b_type, prefabs["generic"])
